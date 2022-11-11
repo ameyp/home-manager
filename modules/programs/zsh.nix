@@ -110,6 +110,17 @@ let
         description = "Share command history between zsh sessions.";
       };
     };
+
+    completionsPkg =
+      if lib.versionAtLeast (lib.getVersion config.nix.package) "2.4pre"
+      then
+        pkgs.nix-zsh-completions.overrideAttrs
+          (_: {
+            postInstall = ''
+              rm $out/share/zsh/site-functions/_nix
+            '';
+          })
+      else pkgs.nix-zsh-completions;
   });
 
   pluginModule = types.submodule ({ config, ... }: {
@@ -485,7 +496,7 @@ in
 
     {
       home.packages = with pkgs; [ zsh ]
-        ++ optional cfg.enableCompletion nix-zsh-completions
+        ++ optional cfg.enableCompletion completionsPkg
         ++ optional cfg.oh-my-zsh.enable oh-my-zsh;
 
       home.file."${relToDotDir ".zshrc"}".text = ''
