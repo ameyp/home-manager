@@ -210,8 +210,9 @@ let
     };
   };
 
+  nixPkg = if config.nix.package == null then pkgs.nix else config.nix.package;
   completionsPkg =
-    if lib.versionAtLeast (lib.getVersion config.nix.package) "2.4pre"
+    if lib.versionAtLeast (lib.getVersion nixPkg) "2.4pre"
     then
       pkgs.nix-zsh-completions.overrideAttrs
         (_: {
